@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.hse_project.vkvideodownloader">
+    package="com.vk.videodownloader">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -9,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VkVideoDownloader">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.vk.videodownloader.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

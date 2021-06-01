@@ -1,4 +1,4 @@
-package com.hse_project.vkvideodownloader
+package com.vk.videodownloader
 
 import org.junit.Test
 
