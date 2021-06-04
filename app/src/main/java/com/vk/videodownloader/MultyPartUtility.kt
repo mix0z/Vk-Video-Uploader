@@ -1,6 +1,6 @@
 package com.vk.videodownloader
 
-import android.net.Uri
+import android.util.Log
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -12,28 +12,20 @@ import java.util.*
  * POST requests to a web server.
  * @author www.codejava.net
  */
-class MultipartUtility(requestURL: String?, private val charset: String) {
-    private val boundary: String
-    private val httpConn: HttpURLConnection
-    private val outputStream: OutputStream
-    private val writer: PrintWriter
+class MultipartUtility(
+    private val requestURL: String?,
+    private val charset: String,
+    private val localInputStream: FileInputStream
+) {
+    private val boundary: String = "===" + System.currentTimeMillis() + "==="
+    private lateinit var httpConn: HttpURLConnection
+    private lateinit var outputStream: OutputStream
+    private lateinit var writer: PrintWriter
+    private val uuid: String = UUID.randomUUID().toString()
+    private var beginPosition: Int = 0
+    private val fileSize: Int = localInputStream.available()
+    private val buffer = ByteArray(5000)
 
-    /**
-     * Adds a form field to the request
-     * @param name field name
-     * @param value field value
-     */
-    fun addFormField(name: String, value: String?) {
-        writer.append("--$boundary").append(LINE_FEED)
-        writer.append("Content-Disposition: form-data; name=\"$name\"")
-            .append(LINE_FEED)
-        writer.append("Content-Type: text/plain; charset=$charset").append(
-            LINE_FEED
-        )
-        writer.append(LINE_FEED)
-        writer.append(value).append(LINE_FEED)
-        writer.flush()
-    }
 
     /**
      * Adds a upload file section to the request
@@ -42,7 +34,20 @@ class MultipartUtility(requestURL: String?, private val charset: String) {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun addFilePart(fieldName: String, inputStream: FileInputStream, fileName: String) {
+    fun addFilePart(fieldName: String, fileName: String) {
+        var bytesRead: Int
+        (localInputStream.read(buffer).also { bytesRead = it })
+
+//        if (bytesRead == -1) {
+//            return
+//        }
+
+        addHeaderField(
+            "Content-Range",
+            "bytes $beginPosition-" + (beginPosition + bytesRead - 1).toString() + "/" + fileSize
+        )
+        beginPosition+= bytesRead
+
         writer.append("--$boundary").append(LINE_FEED)
         writer.append(
             "Content-Disposition: form-data; name=\"" + fieldName
@@ -58,15 +63,21 @@ class MultipartUtility(requestURL: String?, private val charset: String) {
         writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED)
         writer.append(LINE_FEED)
         writer.flush()
-        val buffer = ByteArray(4096)
-        var bytesRead = -1
-        while ((inputStream.read(buffer).also { bytesRead = it }) != -1) {
-            outputStream.write(buffer, 0, bytesRead)
-        }
+
+        outputStream.write(buffer, 0, bytesRead)
+
         outputStream.flush()
-        inputStream.close()
         writer.append(LINE_FEED)
         writer.flush()
+    }
+
+    fun addFileRange(fieldName: String, fileName: String) {
+        do {
+            //Log.d("QQQQQQQQQQQQQQq", localInputStream.available().toString())
+            initNewRequest()
+            addFilePart(fieldName, fileName)
+            finish()
+        } while (fileSize > beginPosition)
     }
 
     /**
@@ -77,6 +88,7 @@ class MultipartUtility(requestURL: String?, private val charset: String) {
     fun addHeaderField(name: String, value: String) {
         writer.append("$name: $value").append(LINE_FEED)
         writer.flush()
+        Log.d("PPPPPPPPPPPPPPPP", value)
     }
 
     /**
@@ -109,6 +121,12 @@ class MultipartUtility(requestURL: String?, private val charset: String) {
         } else {
             throw IOException("Server returned non-OK status: $status")
         }
+        val response_sb = StringBuilder()
+        for (line in response) {
+
+            response_sb.append(line)
+                    }
+        Log.d("AAAAAAAAAAAAAA", response_sb.toString())
         return response
     }
 
@@ -123,10 +141,7 @@ class MultipartUtility(requestURL: String?, private val charset: String) {
      * @param charset
      * @throws IOException
      */
-    init {
-
-        // creates a unique boundary based on time stamp
-        boundary = "===" + System.currentTimeMillis() + "==="
+    private fun initNewRequest() {
         val url = URL(requestURL)
         httpConn = url.openConnection() as HttpURLConnection
         httpConn.useCaches = false
@@ -136,12 +151,11 @@ class MultipartUtility(requestURL: String?, private val charset: String) {
             "Content-Type",
             "multipart/form-data; boundary=$boundary"
         )
-        httpConn.setRequestProperty("User-Agent", "CodeJava Agent")
-        httpConn.setRequestProperty("Test", "Bonjour")
         outputStream = httpConn.outputStream
         writer = PrintWriter(
             OutputStreamWriter(outputStream, charset),
             true
         )
+        addHeaderField("Session-ID", uuid)
     }
 }
