@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var url: String
     private val PICK_VIDEO = 1
     private val buffers: ArrayList<ByteArray> = ArrayList()
+    var fileSize: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +97,19 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<View>(R.id.button) as TextView
         button.setOnClickListener {
             Log.d("BUTTON", "SSSSSSSSSSSSSSSSSSSSSSSs")
+            val inputStream = FileInputStream(
+                this.contentResolver.openFileDescriptor(uri, "r")?.fileDescriptor
+            )
+
+            fileSize = inputStream.available()
+
+            while (inputStream.available() > 0) {
+                val buffer = ByteArray(500000.coerceAtMost(inputStream.available()))
+                inputStream.read(buffer)
+                buffers.add(buffer)
+            }
+
+            inputStream.close()
 
 //            Thread {
 //                val response_sb = StringBuilder()
@@ -121,45 +135,48 @@ class MainActivity : AppCompatActivity() {
 //                uri
 //            )
 
+
             val uuid = UUID.randomUUID().toString()
-            val inputStream = FileInputStream(
-                this.contentResolver.openFileDescriptor(uri, "r")?.fileDescriptor
-            )
 
-            val file1 = ByteArray(4000)
-            inputStream.read(file1)
-//            val file2 = ByteArray(inputStream.available())
-//            inputStream.read(file2)
-            inputStream.close()
-
+            Log.d("QQQQQQQQQQQQQQQQQ", fileSize.toString())
+            Log.d("QQQQQQQQQQQQQQQQQ", buffers.size.toString())
             Thread {
                 val client = OkHttpClient()
 
 
-                val requestBody1: MultipartBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addPart(
-                        headersOf(
-                            "Content-Disposition", "form-data; name=\"" + "video_file"
-                                    + "\"; filename=\"" + getFileName(uri) + "\""
+                var lastSize = 0
+                for (file in buffers) {
+                    val requestBody1: MultipartBody = MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addPart(
+                            headersOf(
+                                "Content-Disposition", "form-data; name=\"" + "video_file"
+                                        + "\"; filename=\"" + getFileName(uri) + "\"",
+                                "Content-Range",
+                                "bytes " + lastSize.toString() + "-" + (lastSize + file.size - 1).toString() + "/" + fileSize,
+                                    "Content-Range",
+                            "bytes " + lastSize.toString() + "-" + (lastSize + file.size - 1).toString() + "/*",
+                                "Session-ID", uuid
                         ),
-                        file1.toRequestBody("video/mp4".toMediaType(), 0, file1.size)
-                    )
-                    .build()
+                            file.toRequestBody("video/mp4".toMediaType(), 0, file.size)
+                        )
+                        .build()
 
-                Log.d("vf", requestBody1.toString())
+                    val request1: Request = Request.Builder()
+                        .addHeader(
+                            "Content-Range",
+                            "bytes " + lastSize.toString() + "-" + (lastSize + file.size - 1).toString() + "/*"
+                        )
+                        .addHeader("Session-ID", uuid)
+                        .url(url)
+                        .post(requestBody1)
+                        .build()
 
-                val request1: Request = Request.Builder()
-                    .addHeader("Session-ID", uuid)
-                    //.addHeader("Content-Range", "bytes " + "0-" + (file1.size - 1).toString() + "/" + (file1.size + file2.size).toString())
-                    .url(url)
-                    .post(requestBody1)
-                    .build()
+                    //Log.d("AAAAAAAAAa", request1.header("Content-Range")!!)
+                    Log.d("AAAAAAAAAa", request1.header("Session-ID")!!)
 
-                // Log.d("AAAAAAAAAa", request1.header("Content-Range")!!)
-                //Log.d("AAAAAAAAAa", request1.header("Session-ID")!!)
+                    lastSize += file.size
 
-                for (i in 1..1000) {
                     val response = client.newCall(request1).execute()
 
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
@@ -168,7 +185,6 @@ class MainActivity : AppCompatActivity() {
 
                     response.close()
                 }
-
                 //Thread.sleep(1000)
 
 //                val response2 = client.newCall(request1).execute()
