@@ -23,10 +23,12 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.internal.closeQuietly
 import java.io.FileInputStream
 import java.io.IOException
 import java.net.SocketException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var uri: Uri
     lateinit var url: String
     private val PICK_VIDEO = 1
+    private val buffers: ArrayList<ByteArray> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                 this.contentResolver.openFileDescriptor(uri, "r")?.fileDescriptor
             )
 
-            val file1 = ByteArray(4000000)
+            val file1 = ByteArray(4000)
             inputStream.read(file1)
 //            val file2 = ByteArray(inputStream.available())
 //            inputStream.read(file2)
@@ -156,20 +159,25 @@ class MainActivity : AppCompatActivity() {
                 // Log.d("AAAAAAAAAa", request1.header("Content-Range")!!)
                 //Log.d("AAAAAAAAAa", request1.header("Session-ID")!!)
 
-                val response = client.newCall(request1).execute()
+                for (i in 1..1000) {
+                    val response = client.newCall(request1).execute()
 
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                Log.d("SSSSSSSSSSSss", response.body!!.string())
+                    Log.d("SSSSSSSSSSSss", response.body!!.string())
 
-                response.close()
-
-                client.newCall(request1).execute().use {
-                    if (!it.isSuccessful) throw IOException("Unexpected code $it")
-
-                    Log.d("SSSSSSSSSSSss", it.body!!.string())
-                    //it.close()
+                    response.close()
                 }
+
+                //Thread.sleep(1000)
+
+//                val response2 = client.newCall(request1).execute()
+//
+//                if (!response2.isSuccessful) throw IOException("Unexpected code $response2")
+//
+//                Log.d("SSSSSSSSSSSss", response2.body!!.string())
+//
+//                response2.closeQuietly()
             }.start()
 //            Thread.sleep(3000)
 //            Thread {
