@@ -2,13 +2,13 @@ package com.vk.videodownloader
 
 import android.content.ContentValues.TAG
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiCallback
@@ -17,30 +17,18 @@ import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
 import com.vk.sdk.api.video.VideoService
 import com.vk.sdk.api.video.dto.VideoSaveResult
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okio.BufferedSink
-import java.io.FileInputStream
-import java.io.IOException
-import java.io.InputStream
-import java.security.AccessController.getContext
-import java.util.*
-import kotlin.collections.ArrayList
+import com.vk.videodownloader.Constants.Companion.PICK_VIDEO
 
 
 class MainActivity : AppCompatActivity() {
-
     lateinit var uri: Uri
     lateinit var url: String
-    private val PICK_VIDEO = 1
-    private val buffers: ArrayList<ByteArray> = ArrayList()
-    var fileSize: Int = 0
+    private var videoUploader: VideoUploader? = null
+    var isPauseOnBackground: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-//        viewModel = MainViewModel()
 
         addOnClickListenerForText()
 
@@ -49,73 +37,55 @@ class MainActivity : AppCompatActivity() {
         addOnClickListenerForButton()
 
         VK.login(this, arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.VIDEO))
-
-        //VK.addTokenExpiredHandler(tokenTracker)
-
-
     }
 
-//    fun getPath(uri: Uri?): String? {
-//        val projection = arrayOf(MediaStore.Video.Media.DATA)
-//        val cursor: Cursor? = contentResolver.query(uri!!, projection, null, null, null)
-//        return if (cursor != null) {
-//            // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
-//            // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-//            val column_index: Int = cursor
-//                .getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
-//            cursor.moveToFirst()
-//            cursor.getString(column_index)
-//        } else null
-//    }
-
-    fun getFileName(uri: Uri): String? {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
-            cursor.use { c ->
-                if (c != null && c.moveToFirst()) {
-                    result = c.getString(c.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                }
-            }
+    override fun onStop() {
+        if (isPauseOnBackground) {
+            Thread {
+                videoUploader?.pause()
+            }.start()
         }
-        if (result == null) {
-            result = uri.path
-            val cut = result!!.lastIndexOf('/')
-            if (cut != -1) {
-                result = result!!.substring(cut + 1)
-            }
-        }
-        return result
+        super.onStop()
     }
 
-    private lateinit var inputStream: InputStream
-    val buffer: ByteArray = ByteArray(500000)
-
-    var leftRange: Long = 0
-
-    private var size = 0
-
-    private val client = OkHttpClient()
+    override fun onStart() {
+        if (isPauseOnBackground) {
+            Thread {
+                videoUploader?.resume()
+            }.start()
+        }
+        super.onStart()
+    }
 
     private fun addOnClickListenerForButton() {
         val button = findViewById<View>(R.id.button) as TextView
         button.setOnClickListener {
-            Log.d("BUTTON", "SSSSSSSSSSSSSSSSSSSSSSSs")
-            inputStream =
-                applicationContext.contentResolver.openInputStream(uri)!!
-            size = inputStream.available() + 210
+            videoUploader =
+                VideoUploader(applicationContext.contentResolver.openInputStream(uri)!!, url)
+            Thread {
+                videoUploader!!.upload()
+            }.start()
 
-            Log.d("ererfrfrferfe", size.toString())
-            val videoUploader = VideoUploader(inputStream, url)
-            videoUploader.upload()
+            val pause = findViewById<View>(R.id.pause) as TextView
+            pause.setOnClickListener {
+                Thread {
+                    videoUploader!!.pause()
+                }.start()
+            }
 
+            val resume = findViewById<View>(R.id.resume) as TextView
+            resume.setOnClickListener {
+                Thread {
+                    videoUploader!!.resume()
+                }.start()
+            }
         }
+
     }
 
     private fun addOnClickListenerForText2() {
         val text2 = findViewById<View>(R.id.text2) as TextView
         text2.setOnClickListener {
-            Log.d("TEXT 2", "SSSSSSSSSSSSSSSSSSSSSSSs")
             pickVideoIntent()
         }
     }
@@ -140,10 +110,7 @@ class MainActivity : AppCompatActivity() {
                 VKApiCallback<VideoSaveResult> {
                 override fun success(result: VideoSaveResult) {
                     url = result.uploadUrl!!
-
                     text.text = url
-
-                    Log.d("URL : ", url)
                 }
 
                 override fun fail(error: Exception) {
@@ -151,17 +118,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
-
-        /*
-         * Получаем адрес для загрузки видео
-         */
     }
-
-//    private val tokenTracker = object: VKTokenExpiredHandler {
-//        override fun onTokenExpired() {
-//            // token expired
-//        }
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
@@ -181,10 +138,13 @@ class MainActivity : AppCompatActivity() {
             super.onActivityResult(requestCode, resultCode, data)
             if (requestCode == PICK_VIDEO) {
                 if (resultCode == RESULT_OK) {
-                    Log.d("XXXXXXXXXXXXXXXXXXXXXxx", data?.data?.encodedPath.toString())
                     uri = data?.data!!
                 } else {
-                    Log.d("FFFFFFFFFFFFFFFFFFFFfff", resultCode.toString())
+                    Toast.makeText(
+                        applicationContext,
+                        "You didn't pick video, try again.",
+                        LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -194,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(
             Intent.ACTION_PICK,
             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        );
+        )
         intent.type = "video/*"
         startActivityForResult(intent, PICK_VIDEO)
     }
