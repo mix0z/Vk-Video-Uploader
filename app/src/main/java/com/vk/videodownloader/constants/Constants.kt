@@ -1,4 +1,4 @@
-package com.vk.videodownloader
+package com.vk.videodownloader.constants
 
 class Constants {
     companion object{

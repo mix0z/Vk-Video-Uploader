@@ -10,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -21,7 +20,8 @@ import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
 import com.vk.sdk.api.video.VideoService
 import com.vk.sdk.api.video.dto.VideoSaveResult
-import com.vk.videodownloader.Constants.Companion.PICK_VIDEO
+import com.vk.videodownloader.constants.Constants.Companion.PICK_VIDEO
+import com.vk.videodownloader.util.VideoUploader
 
 
 class MainActivity : AppCompatActivity() {

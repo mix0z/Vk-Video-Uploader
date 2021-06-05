@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/uploadingFragment"
-        android:name="com.vk.videodownloader.UploadingFragment"
+        android:name="com.vk.videodownloader.fragments.UploadingFragment"
         android:label="fragment_uploading"
         tools:layout="@layout/fragment_uploading" />
     <fragment
         android:id="@+id/uploadedFragment"
-        android:name="com.vk.videodownloader.UploadedFragment"
+        android:name="com.vk.videodownloader.fragments.UploadedFragment"
         android:label="fragment_loaded"
         tools:layout="@layout/fragment_uploaded" />
 </navigation>

@@ -1,8 +1,8 @@
-package com.vk.videodownloader
+package com.vk.videodownloader.util
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.vk.videodownloader.Constants.Companion.BUFFER_SIZE
+import com.vk.videodownloader.constants.Constants.Companion.BUFFER_SIZE
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okio.BufferedSink
