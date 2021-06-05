@@ -17,23 +17,18 @@ import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
 import com.vk.sdk.api.video.VideoService
 import com.vk.sdk.api.video.dto.VideoSaveResult
-import okhttp3.Headers.Companion.headersOf
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.internal.closeQuietly
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okio.BufferedSink
 import java.io.FileInputStream
 import java.io.IOException
-import java.net.SocketException
+import java.io.InputStream
+import java.security.AccessController.getContext
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
-
-    lateinit var viewModel: MainViewModel
 
     lateinit var uri: Uri
     lateinit var url: String
@@ -93,146 +88,26 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
+    private lateinit var inputStream: InputStream
+    val buffer: ByteArray = ByteArray(500000)
+
+    var leftRange: Long = 0
+
+    private var size = 0
+
+    private val client = OkHttpClient()
+
     private fun addOnClickListenerForButton() {
         val button = findViewById<View>(R.id.button) as TextView
         button.setOnClickListener {
             Log.d("BUTTON", "SSSSSSSSSSSSSSSSSSSSSSSs")
-            val inputStream = FileInputStream(
-                this.contentResolver.openFileDescriptor(uri, "r")?.fileDescriptor
-            )
+            inputStream =
+                applicationContext.contentResolver.openInputStream(uri)!!
+            size = inputStream.available() + 210
 
-            fileSize = inputStream.available()
-
-            while (inputStream.available() > 0) {
-                val buffer = ByteArray(500000.coerceAtMost(inputStream.available()))
-                inputStream.read(buffer)
-                buffers.add(buffer)
-            }
-
-            inputStream.close()
-
-//            Thread {
-//                val response_sb = StringBuilder()
-//                try {
-//                    val multipart = MultipartUtility(url, "UTF-8")
-//                    multipart.addFilePart("video_file", FileInputStream(
-//                        this.contentResolver.openFileDescriptor(uri, "r")?.fileDescriptor
-//                    ), getFileName(uri)!!)
-//                    val response: List<String?> = multipart.finish()
-//                    for (line in response) {
-//                        response_sb.append(line)
-//                    }
-//                } catch (e: IOException) {
-//                    e.printStackTrace()
-//                }
-//
-//                Log.d("AAAAAAAaa", response_sb.toString())
-//            }.start()
-
-
-//            val content = InputStreamRequestBody(
-//                "video/mp4".toMediaType(), contentResolver,
-//                uri
-//            )
-
-
-            val uuid = UUID.randomUUID().toString()
-
-            Log.d("QQQQQQQQQQQQQQQQQ", fileSize.toString())
-            Log.d("QQQQQQQQQQQQQQQQQ", buffers.size.toString())
-            Thread {
-                val client = OkHttpClient()
-
-
-                var lastSize = 0
-                for (file in buffers) {
-                    val requestBody1: MultipartBody = MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addPart(
-                            headersOf(
-                                "Content-Disposition", "form-data; name=\"" + "video_file"
-                                        + "\"; filename=\"" + getFileName(uri) + "\"",
-                                "Content-Range",
-                                "bytes " + lastSize.toString() + "-" + (lastSize + file.size - 1).toString() + "/" + fileSize,
-                                    "Content-Range",
-                            "bytes " + lastSize.toString() + "-" + (lastSize + file.size - 1).toString() + "/*",
-                                "Session-ID", uuid
-                        ),
-                            file.toRequestBody("video/mp4".toMediaType(), 0, file.size)
-                        )
-                        .build()
-
-                    val request1: Request = Request.Builder()
-                        .addHeader(
-                            "Content-Range",
-                            "bytes " + lastSize.toString() + "-" + (lastSize + file.size - 1).toString() + "/*"
-                        )
-                        .addHeader("Session-ID", uuid)
-                        .url(url)
-                        .post(requestBody1)
-                        .build()
-
-                    //Log.d("AAAAAAAAAa", request1.header("Content-Range")!!)
-                    Log.d("AAAAAAAAAa", request1.header("Session-ID")!!)
-
-                    lastSize += file.size
-
-                    val response = client.newCall(request1).execute()
-
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                    Log.d("SSSSSSSSSSSss", response.body!!.string())
-
-                    response.close()
-                }
-                //Thread.sleep(1000)
-
-//                val response2 = client.newCall(request1).execute()
-//
-//                if (!response2.isSuccessful) throw IOException("Unexpected code $response2")
-//
-//                Log.d("SSSSSSSSSSSss", response2.body!!.string())
-//
-//                response2.closeQuietly()
-            }.start()
-//            Thread.sleep(3000)
-//            Thread {
-//                val client2 = OkHttpClient()
-//
-//                val requestBody2: MultipartBody = MultipartBody.Builder()
-//                    .setType(MultipartBody.FORM)
-//                    .addPart(
-//                        headersOf(
-//                            "Content-Disposition", "form-data; name=\"" + "video_file"
-//                                    + "\"; filename=\"" + getFileName(uri) + "\""
-//                        ),
-//                        file2.toRequestBody("video/mp4".toMediaType(), 0, file2.size)
-//                    )
-//                    .build()
-//
-//                Log.d("vf", requestBody2.toString())
-//
-//                val request2: Request = Request.Builder()
-//                    .addHeader("Session-ID", uuid)
-//                    //.addHeader("Content-Range", "bytes " + (file1.size).toString() + "-" + (file1.size + file2.size - 1).toString() + "/" + (file1.size + file2.size).toString())
-//                    .url(url)
-//                    .post(requestBody2)
-//                    .build()
-//
-//                //Log.d("AAAAAAAAAa", request2.header("Content-Range")!!)
-//                Log.d("AAAAAAAAAa", request2.header("Session-ID")!!)
-//                try {
-//                client2.newCall(request2).execute().use {
-//                    if (!it.isSuccessful) throw IOException("Unexpected code $it")
-//
-//                    Log.d("SSSSSSSSSSSss", it.body!!.string())
-//                    it.close()
-//                }} catch (e : SocketException) {
-//                    Log.d("wgregetgrgergergergerge", e.message.toString())
-//                    Log.d("wgregetgrgergergergerge", e.cause.toString())
-//                }
-//            }.start()
-
+            Log.d("ererfrfrferfe", size.toString())
+            val videoUploader = VideoUploader(inputStream, url)
+            videoUploader.upload()
 
         }
     }
