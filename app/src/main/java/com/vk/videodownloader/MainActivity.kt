@@ -10,6 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiCallback
 import com.vk.api.sdk.auth.VKAccessToken
@@ -28,8 +32,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        //setContentView(R.layout.activity_main)
+        setContentView(R.layout.layout_for_menu)
 
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        //val navController = Navigation.findNavController(this, R.id.fragmentContainerView)
+
+        val navController = findNavController(R.id.fragmentContainerView)
+
+        bottomNavigationView.setupWithNavController(navController)
+
+
+//        inicializeUploadingMenu()
+    }
+
+    private fun inicializeUploadingMenu() {
         addOnClickListenerForText()
 
         addOnClickListenerForText2()

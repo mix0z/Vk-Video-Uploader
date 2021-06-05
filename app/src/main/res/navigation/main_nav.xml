@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/uploadingFragment">
+
+    <fragment
+        android:id="@+id/uploadingFragment"
+        android:name="com.vk.videodownloader.UploadingFragment"
+        android:label="fragment_uploading"
+        tools:layout="@layout/fragment_uploading" />
+    <fragment
+        android:id="@+id/uploadedFragment"
+        android:name="com.vk.videodownloader.UploadedFragment"
+        android:label="fragment_loaded"
+        tools:layout="@layout/fragment_uploaded" />
+</navigation>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/uploadingFragment"
+        android:title="Uploading"
+        android:iconTint="@color/white"
+        android:icon="@drawable/baseline_upload_black_36"/>
+    <item
+        android:id="@+id/uploadedFragment"
+        android:iconTint="@color/white"
+        android:title="Uploaded"
+        android:icon="@drawable/baseline_done_black_36"/>
+</menu>
