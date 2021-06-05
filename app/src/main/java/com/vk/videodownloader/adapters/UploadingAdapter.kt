@@ -1,6 +1,5 @@
 package com.vk.videodownloader.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +8,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.R
-import com.vk.videodownloader.listeners.VideoOnClickListener
-import com.vk.videodownloader.data.Video
+import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
+import com.vk.videodownloader.data.Uploader
 
-class UploadingAdapter(private val uploading: ArrayList<Video>, private val onClickListener: VideoOnClickListener) : RecyclerView.Adapter<UploadingAdapter.MyViewHolder>() {
+class UploadingAdapter : RecyclerView.Adapter<UploadingAdapter.MyViewHolder>() {
 
     inner class MyViewHolder(view : View) : RecyclerView.ViewHolder(view) {
         val uploadingName: TextView = view.findViewById<View>(R.id.uploadingName) as TextView
@@ -20,8 +19,6 @@ class UploadingAdapter(private val uploading: ArrayList<Video>, private val onCl
         val cancelButton: ImageButton = view.findViewById<View>(R.id.cancelButton) as ImageButton
         val pauseResumeButton: ImageButton = view.findViewById<View>(R.id.pauseResumeButton) as ImageButton
     }
-
-    private var isOnPause: Boolean = false
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -33,29 +30,39 @@ class UploadingAdapter(private val uploading: ArrayList<Video>, private val onCl
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val video : Video = uploading[position]
-        holder.uploadingName.text = video.name
-        holder.uploadingName.setOnClickListener {
-            onClickListener.onClicked(video)
-        }
+        val video : Uploader = uploadingVideos[position]
+        holder.uploadingName.text = video.video.name
+//        holder.uploadingName.setOnClickListener {
+//            onClickListener.onClicked(video.video)
+//        }
         holder.pauseResumeButton.setOnClickListener {
-            //TODO set on pause
-            if (isOnPause) {
-                isOnPause = false
+            if (!video.uploader.getIsOnPause()) {
                 holder.pauseResumeButton.setImageResource(R.drawable.outline_play_arrow_black_36)
+                Thread{
+                    video.uploader.pause()
+                }.start()
             } else {
-                isOnPause = true
                 holder.pauseResumeButton.setImageResource(R.drawable.outline_pause_black_36)
+                Thread{
+                    video.uploader.resume()
+                }.start()
             }
         }
 
         holder.cancelButton.setOnClickListener {
-            //TODO cancel and delete from recyclerview
+            if (!video.uploader.getIsOnPause()) {
+                Thread {
+                    video.uploader.pause()
+                }.start()
+            }
+            uploadingVideos.remove(video)
+            notifyDataSetChanged()
         }
-        holder.progressBar.progress = (video.uploadedSize * 100 / video.size).toInt()
+        video.uploader.progressBar = holder.progressBar
+        video.uploader.uploader = video
     }
 
     override fun getItemCount(): Int {
-        return uploading.size
+        return uploadingVideos.size
     }
 }

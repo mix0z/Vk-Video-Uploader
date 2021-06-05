@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddVideoActivity">
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/private_"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:theme="@style/MySwitch"
+                android:text="Private"
+                app:layout_constraintStart_toStartOf="@+id/addVideo"
+                app:layout_constraintTop_toBottomOf="@+id/addVideo" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/wallpost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:theme="@style/MySwitch"
+                android:text="Wallpost"
+                app:layout_constraintEnd_toEndOf="@+id/addVideo"
+                app:layout_constraintTop_toBottomOf="@+id/addVideo" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/repeat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:theme="@style/MySwitch"
+                android:text="Repeat"
+                app:layout_constraintStart_toStartOf="@+id/wallpost"
+                app:layout_constraintTop_toBottomOf="@+id/wallpost" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/compress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:theme="@style/MySwitch"
+                android:text="Compress"
+                app:layout_constraintStart_toStartOf="@+id/addVideo"
+                app:layout_constraintTop_toBottomOf="@+id/private_" />
+
+           <EditText
+                android:id="@+id/videoName"
+                android:layout_width="280dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="60dp"
+                android:autofillHints="12345"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <EditText
+                android:id="@+id/videoDescription"
+                android:layout_width="280dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="20dp"
+                android:autofillHints="example@gmail.com"
+                android:ems="10"
+                android:hint="Description"
+                android:inputType="textMultiLine"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.503"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/videoName" />
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="40dp"
+                android:text="Cancel"
+                android:backgroundTint="@color/blue"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/submit" />
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Submit"
+                android:backgroundTint="@color/blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/repeat" />
+
+            <ImageButton
+                android:id="@+id/addVideo"
+                android:layout_width="280dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/blue"
+                app:tint="@color/white"
+                android:src="@drawable/baseline_video_library_black_36"
+                app:layout_constraintEnd_toEndOf="@+id/videoDescription"
+                app:layout_constraintTop_toBottomOf="@+id/videoDescription" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

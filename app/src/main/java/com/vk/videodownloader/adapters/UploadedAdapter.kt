@@ -7,10 +7,11 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.R
+import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
 import com.vk.videodownloader.listeners.VideoOnClickListener
 import com.vk.videodownloader.data.Video
 
-class UploadedAdapter(private val uploaded: ArrayList<Video>, private val onClickListener: VideoOnClickListener) : RecyclerView.Adapter<UploadedAdapter.MyViewHolder>() {
+class UploadedAdapter(private val onClickListener: VideoOnClickListener) : RecyclerView.Adapter<UploadedAdapter.MyViewHolder>() {
 
     inner class MyViewHolder(view : View) : RecyclerView.ViewHolder(view) {
         val uploadedName: TextView = view.findViewById<View>(R.id.uploadedName) as TextView
@@ -29,7 +30,7 @@ class UploadedAdapter(private val uploaded: ArrayList<Video>, private val onClic
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val video : Video = uploaded[position]
+        val video : Video = uploadedVideos[position]
         holder.uploadedName.text = video.name
         holder.uploadedName.setOnClickListener {
             onClickListener.onClicked(video)
@@ -38,11 +39,12 @@ class UploadedAdapter(private val uploaded: ArrayList<Video>, private val onClic
         holder.uploadedSize.text = video.size.toString()
 
         holder.deleteButton.setOnClickListener {
-            //TODO delete this from recyclerview
+            uploadedVideos.remove(video)
+            notifyDataSetChanged()
         }
     }
 
     override fun getItemCount(): Int {
-        return uploaded.size
+        return uploadedVideos.size
     }
 }

@@ -1,8 +1,12 @@
 package com.vk.videodownloader.util
 
-import android.util.Log
+import android.annotation.SuppressLint
+import android.widget.ProgressBar
 import androidx.lifecycle.ViewModel
 import com.vk.videodownloader.constants.Constants.Companion.BUFFER_SIZE
+import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
+import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
+import com.vk.videodownloader.data.Uploader
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okio.BufferedSink
@@ -15,8 +19,11 @@ class VideoUploader(
     private val url: String
 ) : ViewModel() {
 
+    @SuppressLint("StaticFieldLeak")
+    lateinit var progressBar: ProgressBar
+    lateinit var uploader: Uploader
     private val buffer: ByteArray = ByteArray(BUFFER_SIZE)
-    private var leftRange: Long = 0L
+    private var leftRange: Int = 0
     private val uuid: String = UUID.randomUUID().toString()
     private val client: OkHttpClient = OkHttpClient()
     private val size: Int = inputStream.available() + 208
@@ -65,7 +72,7 @@ class VideoUploader(
 
             request = Request.Builder()
                 .addHeader("Content-Type", "video/mp4")
-                .addHeader("Content-Disposition", "attachment; filename=\"video.mp4\"")
+                .addHeader("Content-Disposition", "attachment; filename=\"video\"")
                 .addHeader(
                     "Content-Range",
                     "bytes " + leftRange.toString() + "-" + (leftRange + bytesRead) + '/' + (size + 207)
@@ -84,6 +91,12 @@ class VideoUploader(
 
             if (executeRequest()) break
         }
+        if (!isOnPause) {
+            uploadingVideos.remove(uploader)
+            if (!uploadedVideos.contains(uploader.video)) {
+                uploadedVideos.add(uploader.video)
+            }
+        }
     }
 
     private fun executeRequest(): Boolean {
@@ -95,20 +108,25 @@ class VideoUploader(
             isCrashed = true
             return true
         }
-        Log.d("Success", response.message)
-        Log.d("Success", response.code.toString())
-        response.header("Range")?.let { Log.d("Success", it) }
-        response.header("Connection")?.let { Log.d("Success", it) }
-        response.header("Content-Length")?.let { Log.d("Success", it) }
-        response.header("Date")?.let { Log.d("Success", it) }
+//        Log.d("Success", response.message)
+//        Log.d("Success", response.code.toString())
+//        response.header("Range")?.let { Log.d("Success", it) }
+//        response.header("Connection")?.let { Log.d("Success", it) }
+//        response.header("Content-Length")?.let { Log.d("Success", it) }
+//        response.header("Date")?.let { Log.d("Success", it) }
 
-        leftRange += if (leftRange == 0L) {
+        leftRange += if (leftRange == 0) {
             (bytesRead + 208)
         } else {
             bytesRead
         }
+        progressBar.progress = leftRange * 100 / size
         response.close()
 
         return false
+    }
+
+    fun getIsOnPause(): Boolean {
+        return isOnPause
     }
 }

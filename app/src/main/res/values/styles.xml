@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MySwitch" parent="Theme.AppCompat.Light">
+        <!-- активное состояние (30% прозрачности для фона) -->
+        <item name="colorControlActivated">@color/blue</item>
+
+        <!-- неактивное состояние ползунка -->
+        <item name="colorSwitchThumbNormal">@color/blue</item>
+
+        <!-- цвет дорожки для неактивного состояния (30% прозрачности) -->
+        <item name="android:colorForeground">@android:color/darker_gray</item>
+    </style>
+
+    <style name="Specification" parent="Theme.AppCompat.Light">
+        <!-- активное состояние (30% прозрачности для фона) -->
+        <item name="colorControlActivated">@color/blue</item>
+
+        <!-- неактивное состояние ползунка -->
+        <item name="colorSwitchThumbNormal">@color/blue</item>
+
+        <!-- цвет дорожки для неактивного состояния (30% прозрачности) -->
+        <item name="android:colorForeground">@color/blue</item>
+    </style>
+</resources>
