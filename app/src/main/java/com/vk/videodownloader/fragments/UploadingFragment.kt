@@ -13,11 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.AddVideoActivity
 import com.vk.videodownloader.R
 import com.vk.videodownloader.adapters.UploadingAdapter
+import com.vk.videodownloader.constants.Constants
 import com.vk.videodownloader.constants.Constants.Companion.isPauseOnBackground
 
 class UploadingFragment : Fragment() {
     private lateinit var uploadingRV: RecyclerView
-    private lateinit var adapter: UploadingAdapter
+    private lateinit var uploadingAdapter: UploadingAdapter
 
 
     private fun createList() {
@@ -25,8 +26,8 @@ class UploadingFragment : Fragment() {
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
 
         uploadingRV.layoutManager = linearLayoutManager
-        adapter = UploadingAdapter()
-        uploadingRV.adapter = adapter
+        uploadingAdapter = UploadingAdapter()
+        uploadingRV.adapter = uploadingAdapter
     }
 
     override fun onCreateView(
@@ -38,13 +39,25 @@ class UploadingFragment : Fragment() {
         val addButton = view.findViewById<ImageButton>(R.id.addButton)
         addButton.setOnClickListener {
             startActivity(Intent(context, AddVideoActivity::class.java))
-            adapter.notifyDataSetChanged()
+            uploadingAdapter.notifyDataSetChanged()
         }
         val specification = view.findViewById<SwitchCompat>(R.id.specification)
+        specification.isChecked = isPauseOnBackground
         specification.setOnClickListener{
             isPauseOnBackground = specification.isChecked
         }
         createList()
         return view
+    }
+
+    override fun onStop() {
+        Constants.isOnBackground--
+        super.onStop()
+    }
+
+    override fun onStart() {
+        uploadingAdapter.notifyDataSetChanged()
+        Constants.isOnBackground++
+        super.onStart()
     }
 }

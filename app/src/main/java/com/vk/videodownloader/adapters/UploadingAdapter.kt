@@ -35,6 +35,13 @@ class UploadingAdapter : RecyclerView.Adapter<UploadingAdapter.MyViewHolder>() {
 //        holder.uploadingName.setOnClickListener {
 //            onClickListener.onClicked(video.video)
 //        }
+
+        if (video.uploader.getIsOnPause()) {
+            holder.pauseResumeButton.setImageResource(R.drawable.outline_play_arrow_black_36)
+        } else {
+            holder.pauseResumeButton.setImageResource(R.drawable.outline_pause_black_36)
+        }
+
         holder.pauseResumeButton.setOnClickListener {
             if (!video.uploader.getIsOnPause()) {
                 holder.pauseResumeButton.setImageResource(R.drawable.outline_play_arrow_black_36)
@@ -58,6 +65,7 @@ class UploadingAdapter : RecyclerView.Adapter<UploadingAdapter.MyViewHolder>() {
             uploadingVideos.remove(video)
             notifyDataSetChanged()
         }
+        holder.progressBar.progress = video.video.uploadedSize * 100 / video.video.size
         video.uploader.progressBar = holder.progressBar
         video.uploader.uploader = video
     }

@@ -2,9 +2,13 @@ package com.vk.videodownloader
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleObserver
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.vk.videodownloader.constants.Constants
+import com.vk.videodownloader.constants.Constants.Companion.isOnBackground
+import com.vk.videodownloader.constants.Constants.Companion.isPauseOnBackground
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,21 +25,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        //TODO make it for all
-//        if (isPauseOnBackground) {
-//            Thread {
-//                videoUploader?.pause()
-//            }.start()
-//        }
+        Constants.isOnBackground--
         super.onStop()
     }
 
     override fun onStart() {
-//        if (isPauseOnBackground) {
-//            Thread {
-//                videoUploader?.resume()
-//            }.start()
-//        }
+        Constants.isOnBackground++
         super.onStart()
     }
 }

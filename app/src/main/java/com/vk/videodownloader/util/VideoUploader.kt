@@ -1,8 +1,10 @@
 package com.vk.videodownloader.util
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.ProgressBar
 import androidx.lifecycle.ViewModel
+import com.vk.videodownloader.constants.Constants
 import com.vk.videodownloader.constants.Constants.Companion.BUFFER_SIZE
 import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
 import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
@@ -16,7 +18,8 @@ import java.util.*
 
 class VideoUploader(
     private val inputStream: InputStream,
-    private val url: String
+    private val url: String,
+    private val type: String
 ) : ViewModel() {
 
     @SuppressLint("StaticFieldLeak")
@@ -27,7 +30,7 @@ class VideoUploader(
     private val uuid: String = UUID.randomUUID().toString()
     private val client: OkHttpClient = OkHttpClient()
     private val size: Int = inputStream.available() + 208
-    private var isOnPause: Boolean = false
+    private var isOnPause: Boolean = true
     private var isCrashed: Boolean = false
     private lateinit var request: Request
     private var bytesRead = 0
@@ -63,7 +66,7 @@ class VideoUploader(
         upload()
     }
 
-    fun upload() {
+    private fun upload() {
         while (!isOnPause && (inputStream.read(buffer).also { bytesRead = it } != -1)) {
 
             val requestBody: RequestBody = MultipartBody.Builder()
@@ -71,7 +74,7 @@ class VideoUploader(
                 .build()
 
             request = Request.Builder()
-                .addHeader("Content-Type", "video/mp4")
+                .addHeader("Content-Type", type)
                 .addHeader("Content-Disposition", "attachment; filename=\"video\"")
                 .addHeader(
                     "Content-Range",
@@ -101,6 +104,11 @@ class VideoUploader(
 
     private fun executeRequest(): Boolean {
         val response: Response
+        if ((Constants.isOnBackground == 0) && Constants.isPauseOnBackground) {
+            pause()
+            isCrashed = true
+            return true
+        }
         try {
             response = client.newCall(request).execute()
         } catch (e: IOException) {
@@ -108,12 +116,12 @@ class VideoUploader(
             isCrashed = true
             return true
         }
-//        Log.d("Success", response.message)
-//        Log.d("Success", response.code.toString())
-//        response.header("Range")?.let { Log.d("Success", it) }
-//        response.header("Connection")?.let { Log.d("Success", it) }
-//        response.header("Content-Length")?.let { Log.d("Success", it) }
-//        response.header("Date")?.let { Log.d("Success", it) }
+        Log.d("Success", response.message)
+        Log.d("Success", response.code.toString())
+        response.header("Range")?.let { Log.d("Success", it) }
+        response.header("Connection")?.let { Log.d("Success", it) }
+        response.header("Content-Length")?.let { Log.d("Success", it) }
+        response.header("Date")?.let { Log.d("Success", it) }
 
         leftRange += if (leftRange == 0) {
             (bytesRead + 208)
@@ -121,6 +129,7 @@ class VideoUploader(
             bytesRead
         }
         progressBar.progress = leftRange * 100 / size
+        uploader.video.uploadedSize = leftRange
         response.close()
 
         return false

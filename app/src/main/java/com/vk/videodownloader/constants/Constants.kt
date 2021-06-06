@@ -1,5 +1,7 @@
 package com.vk.videodownloader.constants
 
+import com.vk.videodownloader.adapters.UploadedAdapter
+import com.vk.videodownloader.adapters.UploadingAdapter
 import com.vk.videodownloader.data.Uploader
 import com.vk.videodownloader.data.Video
 
@@ -10,5 +12,6 @@ class Constants {
         var uploadingVideos = ArrayList<Uploader>()
         var uploadedVideos = ArrayList<Video>()
         var isPauseOnBackground: Boolean = false
+        var isOnBackground: Int = 0
     }
 }

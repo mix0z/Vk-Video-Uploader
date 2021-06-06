@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.AuthorizationActivity
 import com.vk.videodownloader.R
 import com.vk.videodownloader.adapters.UploadedAdapter
+import com.vk.videodownloader.constants.Constants
 import com.vk.videodownloader.constants.Constants.Companion.isPauseOnBackground
 import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
 import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
@@ -21,7 +22,7 @@ import com.vk.videodownloader.listeners.VideoOnClickListener
 
 class UploadedFragment : Fragment() {
     private lateinit var uploadedRV: RecyclerView
-
+    private lateinit var uploadedAdapter: UploadedAdapter
 
     private fun createList() {
         val linearLayoutManager = LinearLayoutManager(activity)
@@ -29,13 +30,13 @@ class UploadedFragment : Fragment() {
 
         uploadedRV.layoutManager = linearLayoutManager
 
-        val adapter = UploadedAdapter(object : VideoOnClickListener {
+        uploadedAdapter = UploadedAdapter(object : VideoOnClickListener {
             override fun onClicked(uploaded: Video) {
                 Log.d("Click", uploaded.name!!)
             }
 
         })
-        uploadedRV.adapter = adapter
+        uploadedRV.adapter = uploadedAdapter
 
 
     }
@@ -55,5 +56,16 @@ class UploadedFragment : Fragment() {
         }
         createList()
         return view
+    }
+
+    override fun onStop() {
+        Constants.isOnBackground--
+        super.onStop()
+    }
+
+    override fun onStart() {
+        uploadedAdapter.notifyDataSetChanged()
+        Constants.isOnBackground++
+        super.onStart()
     }
 }

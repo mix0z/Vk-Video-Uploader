@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -12,6 +13,7 @@ import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiCallback
 import com.vk.sdk.api.video.VideoService
 import com.vk.sdk.api.video.dto.VideoSaveResult
+import com.vk.videodownloader.constants.Constants
 import com.vk.videodownloader.constants.Constants.Companion.PICK_VIDEO
 import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
 import com.vk.videodownloader.data.Uploader
@@ -122,7 +124,7 @@ class AddVideoActivity : AppCompatActivity() {
                                 url = result.uploadUrl!!
                                 val inputStream = applicationContext.contentResolver.openInputStream(uri)!!
                                 val videoUploader =
-                                    VideoUploader(inputStream, url)
+                                    VideoUploader(inputStream, url, contentResolver.getType(uri).toString())
 
                                 uploadingVideos.add(
                                     Uploader(
@@ -140,9 +142,6 @@ class AddVideoActivity : AppCompatActivity() {
                                         videoUploader
                                     )
                                 )
-                                Thread{
-                                    videoUploader.upload()
-                                }.start()
                                 startActivity(Intent(this@AddVideoActivity, MainActivity::class.java))
                             }
 
@@ -157,5 +156,15 @@ class AddVideoActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        Constants.isOnBackground--
+        super.onStop()
+    }
+
+    override fun onStart() {
+        Constants.isOnBackground++
+        super.onStart()
     }
 }
