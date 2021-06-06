@@ -18,7 +18,11 @@ class AuthorizationActivity : AppCompatActivity() {
         val login = findViewById<Button>(R.id.login)
 
         login.setOnClickListener {
-            VK.login(this, arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.VIDEO))
+            if (VK.isLoggedIn()) {
+                startActivity(Intent(this@AuthorizationActivity, MainActivity::class.java))
+            } else {
+                VK.login(this, arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.VIDEO))
+            }
         }
 
     }

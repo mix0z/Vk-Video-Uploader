@@ -10,6 +10,7 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.vk.api.sdk.VK
 import com.vk.videodownloader.AuthorizationActivity
 import com.vk.videodownloader.R
 import com.vk.videodownloader.adapters.UploadedAdapter
@@ -52,6 +53,7 @@ class UploadedFragment : Fragment() {
             uploadingVideos = ArrayList()
             uploadedVideos = ArrayList()
             isPauseOnBackground = true
+            VK.logout()
             startActivity(Intent(context, AuthorizationActivity::class.java))
         }
         createList()
