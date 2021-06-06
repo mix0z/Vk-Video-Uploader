@@ -16,6 +16,6 @@ App, that allows upload videos to your VK profile.
 ## You can choose the video upload options
 ![](https://github.com/MIXOZ/Vk-video-downloader/raw/master/images/Screenshot_1622979064.png)
 
-## Upload history, which can be edited, is available
+## Upload history, which can be edited
 ![](https://github.com/MIXOZ/Vk-video-downloader/raw/master/images/Screenshot_1622979288.png)
 
