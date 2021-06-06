@@ -2,6 +2,8 @@
 
 App, that allows upload videos to your VK profile.
 
+##[APK](https://github.com/MIXOZ/Vk-video-downloader/blob/master/app-release-unsigned.apk)
+
 ## Two modes of operation
   App can continue uploading on background, or it will upload videos only on foreground.
 
