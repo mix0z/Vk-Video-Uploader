@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.ProgressBar
 import androidx.lifecycle.ViewModel
-import com.vk.videodownloader.constants.Constants
-import com.vk.videodownloader.constants.Constants.Companion.BUFFER_SIZE
-import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
-import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
+import com.vk.videodownloader.common.Common
+import com.vk.videodownloader.common.Common.Companion.BUFFER_SIZE
+import com.vk.videodownloader.common.Common.Companion.uploadedVideos
+import com.vk.videodownloader.common.Common.Companion.uploadingVideos
 import com.vk.videodownloader.data.Uploader
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -26,10 +26,10 @@ class VideoUploader(
     lateinit var progressBar: ProgressBar
     lateinit var uploader: Uploader
     private val buffer: ByteArray = ByteArray(BUFFER_SIZE)
-    private var leftRange: Int = 0
+    var leftRange: Int = 0
     private val uuid: String = UUID.randomUUID().toString()
     private val client: OkHttpClient = OkHttpClient()
-    private val size: Int = inputStream.available() + 208
+    var size: Int = inputStream.available() + 208
     private var isOnPause: Boolean = true
     private var isCrashed: Boolean = false
     private lateinit var request: Request
@@ -104,7 +104,7 @@ class VideoUploader(
 
     private fun executeRequest(): Boolean {
         val response: Response
-        if ((Constants.isOnBackground == 0) && Constants.isPauseOnBackground) {
+        if ((Common.isOnBackground == 0) && Common.isPauseOnBackground) {
             pause()
             isCrashed = true
             return true

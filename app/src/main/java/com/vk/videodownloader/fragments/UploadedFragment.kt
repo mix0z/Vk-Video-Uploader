@@ -14,12 +14,14 @@ import com.vk.api.sdk.VK
 import com.vk.videodownloader.AuthorizationActivity
 import com.vk.videodownloader.R
 import com.vk.videodownloader.adapters.UploadedAdapter
-import com.vk.videodownloader.constants.Constants
-import com.vk.videodownloader.constants.Constants.Companion.isPauseOnBackground
-import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
-import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
+import com.vk.videodownloader.common.Common
+import com.vk.videodownloader.common.Common.Companion.isPauseOnBackground
+import com.vk.videodownloader.common.Common.Companion.uploadedVideos
+import com.vk.videodownloader.common.Common.Companion.uploadingVideos
+import com.vk.videodownloader.common.getVideosFromUploadingVideos
 import com.vk.videodownloader.data.Video
 import com.vk.videodownloader.listeners.VideoOnClickListener
+import com.vk.videodownloader.serialization.JSONHelper
 
 class UploadedFragment : Fragment() {
     private lateinit var uploadedRV: RecyclerView
@@ -61,13 +63,19 @@ class UploadedFragment : Fragment() {
     }
 
     override fun onStop() {
-        Constants.isOnBackground--
+        Common.isOnBackground--
         super.onStop()
     }
 
     override fun onStart() {
         uploadedAdapter.notifyDataSetChanged()
-        Constants.isOnBackground++
+        Common.isOnBackground++
         super.onStart()
+    }
+
+    override fun onDestroy() {
+        JSONHelper.exportToJSON(requireContext(), uploadedVideos, Common.Companion.Type.UPLOADED)
+        JSONHelper.exportToJSON(requireContext(), getVideosFromUploadingVideos(), Common.Companion.Type.UPLOADING)
+        super.onDestroy()
     }
 }

@@ -3,9 +3,7 @@ package com.vk.videodownloader
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.TextUtils
-import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -13,13 +11,16 @@ import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiCallback
 import com.vk.sdk.api.video.VideoService
 import com.vk.sdk.api.video.dto.VideoSaveResult
-import com.vk.videodownloader.constants.Constants
-import com.vk.videodownloader.constants.Constants.Companion.PICK_VIDEO
-import com.vk.videodownloader.constants.Constants.Companion.uploadingVideos
+import com.vk.videodownloader.common.Common
+import com.vk.videodownloader.common.Common.Companion.PICK_VIDEO
+import com.vk.videodownloader.common.Common.Companion.uploadingVideos
+import com.vk.videodownloader.common.getVideosFromUploadingVideos
 import com.vk.videodownloader.data.Uploader
 import com.vk.videodownloader.data.Video
+import com.vk.videodownloader.serialization.JSONHelper
 import com.vk.videodownloader.util.VideoUploader
 import java.util.*
+
 
 class AddVideoActivity : AppCompatActivity() {
     lateinit var uri: Uri
@@ -67,10 +68,10 @@ class AddVideoActivity : AppCompatActivity() {
     }
 
     private fun pickVideoIntent() {
-        val intent = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.type = "video/*"
         startActivityForResult(intent, PICK_VIDEO)
     }
@@ -130,14 +131,11 @@ class AddVideoActivity : AppCompatActivity() {
                                     Uploader(
                                         Video(
                                             name,
-                                            description,
-                                            private.isChecked,
-                                            wallPost.isChecked,
-                                            repeat.isChecked,
-                                            compress.isChecked,
                                             inputStream.available(),
                                             0,
                                             Calendar.getInstance().time.toString(),
+                                            uri,
+                                            url
                                         ),
                                         videoUploader
                                     )
@@ -159,12 +157,18 @@ class AddVideoActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        Constants.isOnBackground--
+        Common.isOnBackground--
         super.onStop()
     }
 
     override fun onStart() {
-        Constants.isOnBackground++
+        Common.isOnBackground++
         super.onStart()
+    }
+
+    override fun onDestroy() {
+        JSONHelper.exportToJSON(this, Common.uploadedVideos, Common.Companion.Type.UPLOADED)
+        JSONHelper.exportToJSON(this, getVideosFromUploadingVideos(), Common.Companion.Type.UPLOADING)
+        super.onDestroy()
     }
 }

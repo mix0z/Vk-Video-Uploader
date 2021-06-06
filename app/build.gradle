@@ -59,6 +59,9 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
 
+    //GSON
+    implementation 'com.google.code.gson:gson:2.8.6'
+
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'

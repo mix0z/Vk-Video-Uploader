@@ -7,7 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.R
-import com.vk.videodownloader.constants.Constants.Companion.uploadedVideos
+import com.vk.videodownloader.common.Common.Companion.uploadedVideos
 import com.vk.videodownloader.listeners.VideoOnClickListener
 import com.vk.videodownloader.data.Video
 

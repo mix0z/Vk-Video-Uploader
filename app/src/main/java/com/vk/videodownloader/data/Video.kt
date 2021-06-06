@@ -1,13 +1,13 @@
 package com.vk.videodownloader.data
 
-data class Video(
+import android.net.Uri
+
+class Video(
     var name: String? = null,
-    var description: String? = null,
-    var isPrivate: Boolean? = null,
-    var wallpost: Boolean? = null,
-    var repeat: Boolean? = null,
-    var compression: Boolean? = null,
     var size: Int,
     var uploadedSize: Int,
-    var date: String
-)
+    var date: String,
+    var uri: Uri,
+    var url: String
+) {
+}
