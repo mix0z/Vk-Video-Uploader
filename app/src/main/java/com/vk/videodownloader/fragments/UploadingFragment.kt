@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.AddVideoActivity
-import com.vk.videodownloader.LoadResumingVideo
 import com.vk.videodownloader.R
 import com.vk.videodownloader.adapters.UploadingAdapter
 import com.vk.videodownloader.common.Common
@@ -22,6 +21,7 @@ import com.vk.videodownloader.common.Common.Companion.isPauseOnBackground
 import com.vk.videodownloader.common.getVideosFromUploadingVideos
 import com.vk.videodownloader.data.Uploader
 import com.vk.videodownloader.serialization.JSONHelper
+import com.vk.videodownloader.util.LoadResumingVideo
 import com.vk.videodownloader.util.VideoUploader
 
 class UploadingFragment : Fragment() {
@@ -63,7 +63,7 @@ class UploadingFragment : Fragment() {
                             .toString()
                     )
                 video.uploader!!.leftRange = video.video.uploadedSize
-                video.uploader!!.size+= video.video.uploadedSize - 208
+                video.uploader!!.size += video.video.uploadedSize - 208
 
                 uploadingAdapter.notifyDataSetChanged()
 
@@ -86,10 +86,7 @@ class UploadingFragment : Fragment() {
             override fun onClicked(video: Uploader) {
                 this@UploadingFragment.video = video
                 pickVideoIntent()
-
             }
-
-
         })
         uploadingRV.adapter = uploadingAdapter
     }

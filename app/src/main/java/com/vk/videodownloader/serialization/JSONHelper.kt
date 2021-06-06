@@ -19,14 +19,14 @@ class UriInOut : JsonSerializer<Uri>, JsonDeserializer<Uri> {
         typeOfSrc: java.lang.reflect.Type,
         context: JsonSerializationContext
     ): JsonElement {
-        return JsonPrimitive(src.toString());
+        return JsonPrimitive(src.toString())
     }
 
     override fun deserialize(
         src: JsonElement, srcType: java.lang.reflect.Type,
         context: JsonDeserializationContext
     ): Uri {
-        return Uri.parse(src.asString);
+        return Uri.parse(src.asString)
     }
 }
 
@@ -39,9 +39,9 @@ internal object JSONHelper {
         dataList: ArrayList<Video>,
         type: Common.Companion.Type
     ): Boolean {
-        val gson =  GsonBuilder()
+        val gson = GsonBuilder()
             .registerTypeAdapter(Uri::class.java, UriInOut())
-            .create();
+            .create()
         val dataItems = DataItems()
         dataItems.videos = dataList
         val jsonString = gson.toJson(dataItems)
@@ -82,7 +82,7 @@ internal object JSONHelper {
             streamReader = InputStreamReader(fileInputStream)
             val gson = GsonBuilder()
                 .registerTypeAdapter(Uri::class.java, UriInOut())
-                .create();
+                .create()
             val dataItems = gson.fromJson(streamReader, DataItems::class.java)
             return dataItems.videos
         } catch (ex: IOException) {

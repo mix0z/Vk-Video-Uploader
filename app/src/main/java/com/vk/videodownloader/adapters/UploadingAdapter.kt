@@ -9,36 +9,35 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.vk.videodownloader.LoadResumingVideo
+import com.vk.videodownloader.util.LoadResumingVideo
 import com.vk.videodownloader.R
 import com.vk.videodownloader.common.Common.Companion.uploadingVideos
 import com.vk.videodownloader.data.Uploader
 
-class UploadingAdapter(private val onClickListener: LoadResumingVideo) : RecyclerView.Adapter<UploadingAdapter.MyViewHolder>() {
+class UploadingAdapter(private val onClickListener: LoadResumingVideo) :
+    RecyclerView.Adapter<UploadingAdapter.MyViewHolder>() {
 
-    inner class MyViewHolder(view : View) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val uploadingName: TextView = view.findViewById<View>(R.id.uploadingName) as TextView
         val progressBar: ProgressBar = view.findViewById<View>(R.id.progressBar) as ProgressBar
         val cancelButton: ImageButton = view.findViewById<View>(R.id.cancelButton) as ImageButton
-        val pauseResumeButton: ImageButton = view.findViewById<View>(R.id.pauseResumeButton) as ImageButton
+        val pauseResumeButton: ImageButton =
+            view.findViewById<View>(R.id.pauseResumeButton) as ImageButton
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): MyViewHolder {
-        val itemView : View = LayoutInflater.from(parent.context)
+        val itemView: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.uploading_item, parent, false)
         return MyViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val video : Uploader = uploadingVideos[position]
+        val video: Uploader = uploadingVideos[position]
         holder.uploadingName.text = video.video.name
-//        holder.uploadingName.setOnClickListener {
-//            onClickListener.onClicked(video.video)
-//        }
 
         if (video.uploader == null) {
             holder.progressBar.visibility = INVISIBLE

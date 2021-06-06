@@ -25,15 +25,15 @@ class VideoUploader(
     @SuppressLint("StaticFieldLeak")
     lateinit var progressBar: ProgressBar
     lateinit var uploader: Uploader
+    private lateinit var request: Request
     private val buffer: ByteArray = ByteArray(BUFFER_SIZE)
-    var leftRange: Int = 0
     private val uuid: String = UUID.randomUUID().toString()
     private val client: OkHttpClient = OkHttpClient()
-    var size: Int = inputStream.available() + 208
     private var isOnPause: Boolean = true
     private var isCrashed: Boolean = false
-    private lateinit var request: Request
     private var bytesRead = 0
+    var leftRange: Int = 0
+    var size: Int = inputStream.available() + 208
 
 
     private fun getRequestBody(buffer: ByteArray, size: Int): RequestBody {

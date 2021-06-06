@@ -123,9 +123,14 @@ class AddVideoActivity : AppCompatActivity() {
                             VKApiCallback<VideoSaveResult> {
                             override fun success(result: VideoSaveResult) {
                                 url = result.uploadUrl!!
-                                val inputStream = applicationContext.contentResolver.openInputStream(uri)!!
+                                val inputStream =
+                                    applicationContext.contentResolver.openInputStream(uri)!!
                                 val videoUploader =
-                                    VideoUploader(inputStream, url, contentResolver.getType(uri).toString())
+                                    VideoUploader(
+                                        inputStream,
+                                        url,
+                                        contentResolver.getType(uri).toString()
+                                    )
 
                                 uploadingVideos.add(
                                     Uploader(
@@ -134,13 +139,17 @@ class AddVideoActivity : AppCompatActivity() {
                                             inputStream.available(),
                                             0,
                                             Calendar.getInstance().time.toString(),
-                                            uri,
                                             url
                                         ),
                                         videoUploader
                                     )
                                 )
-                                startActivity(Intent(this@AddVideoActivity, MainActivity::class.java))
+                                startActivity(
+                                    Intent(
+                                        this@AddVideoActivity,
+                                        MainActivity::class.java
+                                    )
+                                )
                             }
 
                             override fun fail(error: Exception) {
@@ -168,7 +177,11 @@ class AddVideoActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         JSONHelper.exportToJSON(this, Common.uploadedVideos, Common.Companion.Type.UPLOADED)
-        JSONHelper.exportToJSON(this, getVideosFromUploadingVideos(), Common.Companion.Type.UPLOADING)
+        JSONHelper.exportToJSON(
+            this,
+            getVideosFromUploadingVideos(),
+            Common.Companion.Type.UPLOADING
+        )
         super.onDestroy()
     }
 }

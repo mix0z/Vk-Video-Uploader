@@ -37,11 +37,8 @@ class UploadedFragment : Fragment() {
             override fun onClicked(uploaded: Video) {
                 Log.d("Click", uploaded.name!!)
             }
-
         })
         uploadedRV.adapter = uploadedAdapter
-
-
     }
 
     override fun onCreateView(
@@ -75,7 +72,11 @@ class UploadedFragment : Fragment() {
 
     override fun onDestroy() {
         JSONHelper.exportToJSON(requireContext(), uploadedVideos, Common.Companion.Type.UPLOADED)
-        JSONHelper.exportToJSON(requireContext(), getVideosFromUploadingVideos(), Common.Companion.Type.UPLOADING)
+        JSONHelper.exportToJSON(
+            requireContext(),
+            getVideosFromUploadingVideos(),
+            Common.Companion.Type.UPLOADING
+        )
         super.onDestroy()
     }
 }

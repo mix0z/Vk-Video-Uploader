@@ -8,12 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vk.videodownloader.R
 import com.vk.videodownloader.common.Common.Companion.uploadedVideos
-import com.vk.videodownloader.listeners.VideoOnClickListener
 import com.vk.videodownloader.data.Video
+import com.vk.videodownloader.listeners.VideoOnClickListener
 
-class UploadedAdapter(private val onClickListener: VideoOnClickListener) : RecyclerView.Adapter<UploadedAdapter.MyViewHolder>() {
+class UploadedAdapter(private val onClickListener: VideoOnClickListener) :
+    RecyclerView.Adapter<UploadedAdapter.MyViewHolder>() {
 
-    inner class MyViewHolder(view : View) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val uploadedName: TextView = view.findViewById<View>(R.id.uploadedName) as TextView
         val uploadedDate: TextView = view.findViewById<View>(R.id.uploadedDate) as TextView
         val uploadedSize: TextView = view.findViewById<View>(R.id.uploadedSize) as TextView
@@ -24,13 +25,13 @@ class UploadedAdapter(private val onClickListener: VideoOnClickListener) : Recyc
         parent: ViewGroup,
         viewType: Int
     ): MyViewHolder {
-        val itemView : View = LayoutInflater.from(parent.context)
+        val itemView: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.uploaded_item, parent, false)
         return MyViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val video : Video = uploadedVideos[position]
+        val video: Video = uploadedVideos[position]
         holder.uploadedName.text = video.name
         holder.uploadedName.setOnClickListener {
             onClickListener.onClicked(video)

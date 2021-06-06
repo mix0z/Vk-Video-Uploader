@@ -1,4 +1,4 @@
-package com.vk.videodownloader
+package com.vk.videodownloader.util
 
 import com.vk.videodownloader.data.Uploader
 
