@@ -1,4 +1,4 @@
-# Vk-video-downloader
+# Vk video uploader
 
 App, that allows upload videos to your VK profile.
 
